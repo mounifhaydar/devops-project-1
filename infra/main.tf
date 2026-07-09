@@ -1,10 +1,13 @@
-module "s3" {
-  source      = "./s3"
-  bucket_name = var.bucket_name
-  name        = var.name
-  environment = var.bucket_name
-  region      = "eu-central-1"
-}
+# The remote state bucket is expected to exist already and is referenced by the
+# Terraform backend configuration. Creating it again here can conflict with the
+# backend initialization in CI.
+# module "s3" {
+#   source      = "./s3"
+#   bucket_name = var.bucket_name
+#   name        = var.name
+#   environment = var.bucket_name
+#   region      = "eu-central-1"
+# }
 
 module "networking" {
   source               = "./networking"
