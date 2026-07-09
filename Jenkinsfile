@@ -37,7 +37,7 @@ pipeline {
                         export AWS_REGION=eu-central-1
                         export AWS_DEFAULT_REGION=eu-central-1
                         export AWS_PROFILE=default
-                        terraform init -backend=false -input=false
+                        terraform init -input=false -reconfigure -backend-config="bucket=dev-proj-1-remote-state-bucket" -backend-config="key=devops-project-1/terraform.tfstate" -backend-config="region=ap-southeast-1"
                         '''
                     }
                 }
