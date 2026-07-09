@@ -36,7 +36,7 @@ pipeline {
                         fi
                         export AWS_REGION=eu-central-1
                         export AWS_DEFAULT_REGION=eu-central-1
-                        export AWS_PROFILE=default
+                        unset AWS_PROFILE AWS_DEFAULT_PROFILE
                         terraform init -input=false -reconfigure -backend-config="bucket=dev-proj-1-remote-state-bucket" -backend-config="key=devops-project-1/terraform.tfstate" -backend-config="region=ap-southeast-1"
                         '''
                     }
@@ -61,7 +61,7 @@ pipeline {
                                 fi
                                 export AWS_REGION=eu-central-1
                                 export AWS_DEFAULT_REGION=eu-central-1
-                                export AWS_PROFILE=default
+                                unset AWS_PROFILE AWS_DEFAULT_PROFILE
                                 terraform plan -var-file=terraform.tfvars -no-color
                                 '''
                             }
@@ -88,7 +88,7 @@ pipeline {
                                 fi
                                 export AWS_REGION=eu-central-1
                                 export AWS_DEFAULT_REGION=eu-central-1
-                                export AWS_PROFILE=default
+                                unset AWS_PROFILE AWS_DEFAULT_PROFILE
                                 terraform apply -auto-approve -var-file=terraform.tfvars -no-color
                                 '''
                             }
@@ -115,7 +115,7 @@ pipeline {
                                 fi
                                 export AWS_REGION=eu-central-1
                                 export AWS_DEFAULT_REGION=eu-central-1
-                                export AWS_PROFILE=default
+                                unset AWS_PROFILE AWS_DEFAULT_PROFILE
                                 terraform destroy -auto-approve -var-file=terraform.tfvars -no-color
                                 '''
                             }
