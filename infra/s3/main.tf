@@ -47,3 +47,35 @@ resource "aws_s3_bucket_public_access_block" "remote_state_public_access" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+# Allow the current AWS account to use the bucket as Terraform remote state storage.
+# This is intentionally broad for the backend bucket and is suitable for CI/CD
+# credentials that need to read/write the state file.
+data "aws_caller_identity" "current" {}
+
+resource "aws_s3_bucket_policy" "remote_state_policy" {
+  bucket = aws_s3_bucket.remote_state_bucket.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "TerraformStateAccess"
+        Effect    = "Allow"
+        Principal = {
+          AWS = data.aws_caller_identity.current.arn
+        }
+        Action = [
+          "s3:ListBucket",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = [
+          aws_s3_bucket.remote_state_bucket.arn,
+          "${aws_s3_bucket.remote_state_bucket.arn}/*"
+        ]
+      }
+    ]
+  })
+}
