@@ -63,7 +63,7 @@ resource "aws_s3_bucket_policy" "remote_state_policy" {
         Sid       = "TerraformStateAccess"
         Effect    = "Allow"
         Principal = {
-          AWS = data.aws_caller_identity.current.arn
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         }
         Action = [
           "s3:ListBucket",

@@ -13,7 +13,7 @@ provider "aws" {
 
 # Values from devops-project-1/infra/terraform.tfvars
 locals {
-  bucket_name = "dev-proj-1-remote-state-bucket"
+  bucket_name = "dev-proj-1-remote-state-527397543025"
   name        = "environment"
   environment = "dev-1"
 }
