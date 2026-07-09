@@ -8,9 +8,10 @@ cidr_public_subnet   = ["10.0.1.0/24", "10.0.2.0/24"]
 cidr_private_subnet  = ["10.0.3.0/24", "10.0.4.0/24"]
 eu_availability_zone = ["eu-central-1a", "eu-central-1b"]
 
-public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDwmgMHFJE7J4qepIzAZL3/yC6J0zsEAb/oHYL+WBBDNUjSH4TeHUnHVNe9b/pyPcub+O/HNvlGrzSxUp0xT0b3O7kkTtgBKiG8NaBbonj+c7byfOGER80DYxc5adlBltuIDd8StFe7OMzbYyUSr1mdxDTIWm/OoE39G/fu3hTqUGkykv072GAy8nMFejITRw9pf+53B9ziE5rsdOUH4uqBiQa/Ng/qKo7h9MtJGcloRATYiObXwAgrHtt3sDrtvkq2ZceT906/BJm1Twlm+BHlQecHV18Ak3bzm/6HzlsA/q+yORsoB+VxSUxvVy0nXTc1X8vJAD4KSYVL5DTrpisdnQAIcuqAbea+LMku2o4sdnrrIlUi8/8BXeVbI4TNNGd0+sWpCVcDEhb4gyA/XXTvloQyjTYrL4+am/9XEY6NGdsrPK74sjvtpUZPUrmzTJ/mJWG5ncGY88GAj+YZAsY5pnAqh2CkR2TUpglugldnWyrppbe2QyC9iQkgUGSkBTs= rahulwagh@Rahuls-MacBook-Pro.local"
-ec2_ami_id     = "ami-06dd92ecc74fdfb36"
+# EC2 Configuration
+public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCcwPcI3qJiWBA3FfIT9Roaxl1vQIsTEN3qNZitQ9jNf4cer6R2FmsYM8pKvadCMqeYNthIJZoDVTe7EGJ8khdwnbesN1kF8lWEmjCKYf8RZpbqs8bgWXBixU4u3z60jMjeA+AY4OmzFQ+OrNp009TpPb12jFEDx9qX8n6/0zabUwc17k8ztjvPgtJ+VfIUUEcjM2N6AhcZYNwNNrxfSp8OaEcFeDdyJ47dthaNg2q4FTLvSnT05LT5nrII3wwC3jKcBIsMiMblrULL/+RUQanUblMs2AiwgiodYGIyRssIR0Cv2AI9JZ+a5OIMv12OwnCXEy5YtM1hdbHlwXJx9924t72oInFpz3UkKAVytqQWd/kKh5G84pTWxC6250IJQa0yxrz5ase5Ih0Tyfyf+bbiI7rLq8YeE/We4wumn7ptTF4F+EXvuqWNjx8OPqITiy8LWdSeSZ0vfwtBeSmc9ccnTtvlbQK1E9y9INYdGZQXBIFJtGGyPxPBsbC18YOl2Sk= user@DESKTOP-BFDBACI"
+ec2_ami_id = "ami-0d1ddd83282187d18"
 
-ec2_user_data_install_apache = ""
+ec2_user_data_install_apache = "#!/bin/bash\necho 'Terraform pipeline bootstrap' > /tmp/pipeline-bootstrap.txt"
 
 domain_name = "jhooq.org"

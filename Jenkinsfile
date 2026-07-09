@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        terraform 'terraform'
-    }
-    
     parameters {
             booleanParam(name: 'PLAN_TERRAFORM', defaultValue: false, description: 'Check to plan Terraform changes')
             booleanParam(name: 'APPLY_TERRAFORM', defaultValue: false, description: 'Check to apply Terraform changes')
@@ -26,14 +22,26 @@ pipeline {
         }
 
         stage('Terraform Init') {
-                    steps {
-                       withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials-mhaydar']]){
-                            dir('infra') {
-                            sh 'echo "=================Terraform Init=================="'
-                            sh 'terraform init'
-                        }
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials-mhaydar']]) {
+                    dir('infra') {
+                        sh '''
+                        set -e
+                        echo "=================Terraform Init=================="
+                        if ! command -v terraform >/dev/null 2>&1; then
+                          curl -fsSLo /tmp/terraform.zip https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip
+                          unzip -o /tmp/terraform.zip -d /tmp/terraform-bin >/dev/null
+                          chmod +x /tmp/terraform-bin/terraform
+                          export PATH="/tmp/terraform-bin:$PATH"
+                        fi
+                        export AWS_REGION=eu-central-1
+                        export AWS_DEFAULT_REGION=eu-central-1
+                        export AWS_PROFILE=default
+                        terraform init -backend=false -input=false
+                        '''
                     }
                 }
+            }
         }
 
         stage('Terraform Plan') {
@@ -42,8 +50,20 @@ pipeline {
                     if (params.PLAN_TERRAFORM) {
                        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials-mhaydar']]){
                             dir('infra') {
-                                sh 'echo "=================Terraform Plan=================="'
-                                sh 'terraform plan'
+                                sh '''
+                                set -e
+                                echo "=================Terraform Plan=================="
+                                if ! command -v terraform >/dev/null 2>&1; then
+                                  curl -fsSLo /tmp/terraform.zip https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip
+                                  unzip -o /tmp/terraform.zip -d /tmp/terraform-bin >/dev/null
+                                  chmod +x /tmp/terraform-bin/terraform
+                                  export PATH="/tmp/terraform-bin:$PATH"
+                                fi
+                                export AWS_REGION=eu-central-1
+                                export AWS_DEFAULT_REGION=eu-central-1
+                                export AWS_PROFILE=default
+                                terraform plan -var-file=terraform.tfvars -no-color
+                                '''
                             }
                         }
                     }
@@ -57,8 +77,20 @@ pipeline {
                     if (params.APPLY_TERRAFORM) {
                        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials-mhaydar']]){
                             dir('infra') {
-                                sh 'echo "=================Terraform Apply=================="'
-                                sh 'terraform apply -auto-approve'
+                                sh '''
+                                set -e
+                                echo "=================Terraform Apply=================="
+                                if ! command -v terraform >/dev/null 2>&1; then
+                                  curl -fsSLo /tmp/terraform.zip https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip
+                                  unzip -o /tmp/terraform.zip -d /tmp/terraform-bin >/dev/null
+                                  chmod +x /tmp/terraform-bin/terraform
+                                  export PATH="/tmp/terraform-bin:$PATH"
+                                fi
+                                export AWS_REGION=eu-central-1
+                                export AWS_DEFAULT_REGION=eu-central-1
+                                export AWS_PROFILE=default
+                                terraform apply -auto-approve -var-file=terraform.tfvars -no-color
+                                '''
                             }
                         }
                     }
@@ -72,8 +104,20 @@ pipeline {
                     if (params.DESTROY_TERRAFORM) {
                        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials-mhaydar']]){
                             dir('infra') {
-                                sh 'echo "=================Terraform Destroy=================="'
-                                sh 'terraform destroy -auto-approve'
+                                sh '''
+                                set -e
+                                echo "=================Terraform Destroy=================="
+                                if ! command -v terraform >/dev/null 2>&1; then
+                                  curl -fsSLo /tmp/terraform.zip https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip
+                                  unzip -o /tmp/terraform.zip -d /tmp/terraform-bin >/dev/null
+                                  chmod +x /tmp/terraform-bin/terraform
+                                  export PATH="/tmp/terraform-bin:$PATH"
+                                fi
+                                export AWS_REGION=eu-central-1
+                                export AWS_DEFAULT_REGION=eu-central-1
+                                export AWS_PROFILE=default
+                                terraform destroy -auto-approve -var-file=terraform.tfvars -no-color
+                                '''
                             }
                         }
                     }

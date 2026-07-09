@@ -1,9 +1,10 @@
-/*module "s3" {
+module "s3" {
   source      = "./s3"
   bucket_name = var.bucket_name
   name        = var.name
   environment = var.bucket_name
-}*/
+  region      = "eu-central-1"
+}
 
 module "networking" {
   source               = "./networking"
@@ -23,16 +24,18 @@ module "security_group" {
 }
 
 module "ec2" {
-  source                   = "./ec2"
-  ami_id                   = var.ec2_ami_id
-  instance_type            = "t2.micro"
-  tag_name                 = "Ubuntu Linux EC2"
-  public_key               = var.public_key
-  subnet_id                = tolist(module.networking.dev_proj_1_public_subnets)[0]
-  sg_enable_ssh_https      = module.security_group.sg_ec2_sg_ssh_http_id
-  ec2_sg_name_for_python_api     = module.security_group.sg_ec2_for_python_api
-  enable_public_ip_address = true
-  user_data_install_apache = templatefile("./template/ec2_install_apache.sh", {})
+  source                     = "./ec2"
+  ami_id                     = var.ec2_ami_id
+  instance_type              = "t2.micro"
+  tag_name                   = "Ubuntu Linux EC2"
+  public_key                 = var.public_key
+  subnet_id                  = tolist(module.networking.dev_proj_1_public_subnets)[0]
+  sg_enable_ssh_https        = module.security_group.sg_ec2_sg_ssh_http_id
+  ec2_sg_name_for_python_api = module.security_group.sg_ec2_for_python_api
+  enable_public_ip_address   = true
+  user_data_install_apache   = var.ec2_user_data_install_apache != "" ? var.ec2_user_data_install_apache : templatefile("./template/ec2_install_apache.sh", {})
+  ssh_private_key_path       = "~/.ssh/aws_ec2_terraform"
+  ssh_user                   = "ec2-user"
 }
 
 module "lb_target_group" {
@@ -45,21 +48,21 @@ module "lb_target_group" {
 }
 
 module "alb" {
-  source                    = "./load-balancer"
-  lb_name                   = "dev-proj-1-alb"
-  is_external               = false
-  lb_type                   = "application"
-  sg_enable_ssh_https       = module.security_group.sg_ec2_sg_ssh_http_id
-  subnet_ids                = tolist(module.networking.dev_proj_1_public_subnets)
-  tag_name                  = "dev-proj-1-alb"
-  lb_target_group_arn       = module.lb_target_group.dev_proj_1_lb_target_group_arn
-  ec2_instance_id           = module.ec2.dev_proj_1_ec2_instance_id
-  lb_listner_port           = 5000
-  lb_listner_protocol       = "HTTP"
-  lb_listner_default_action = "forward"
-  lb_https_listner_port     = 443
-  lb_https_listner_protocol = "HTTPS"
-  dev_proj_1_acm_arn        = module.aws_ceritification_manager.dev_proj_1_acm_arn
+  source                          = "./load-balancer"
+  lb_name                         = "dev-proj-1-alb"
+  is_external                     = false
+  lb_type                         = "application"
+  sg_enable_ssh_https             = module.security_group.sg_ec2_sg_ssh_http_id
+  subnet_ids                      = tolist(module.networking.dev_proj_1_public_subnets)
+  tag_name                        = "dev-proj-1-alb"
+  lb_target_group_arn             = module.lb_target_group.dev_proj_1_lb_target_group_arn
+  ec2_instance_id                 = module.ec2.dev_proj_1_ec2_instance_id
+  lb_listner_port                 = 5000
+  lb_listner_protocol             = "HTTP"
+  lb_listner_default_action       = "forward"
+  lb_https_listner_port           = 443
+  lb_https_listner_protocol       = "HTTPS"
+  dev_proj_1_acm_arn              = module.aws_ceritification_manager.dev_proj_1_acm_arn
   lb_target_group_attachment_port = 5000
 }
 
