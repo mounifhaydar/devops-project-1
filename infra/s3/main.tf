@@ -12,8 +12,19 @@ output "remote_state_s3_bucket_arn" {
 }
 
 # S3 bucket for Terraform remote state
+# The bucket is expected to already exist and is managed separately.
+# To use an existing bucket, import it: terraform import aws_s3_bucket.remote_state_bucket <bucket-name>
+data "aws_s3_bucket" "remote_state_bucket" {
+  bucket = var.bucket_name
+}
+
+# Placeholder resource for backward compatibility - will be replaced by data source
 resource "aws_s3_bucket" "remote_state_bucket" {
   bucket = var.bucket_name
+
+  lifecycle {
+    ignore_changes = all
+  }
 
   tags = {
     Name        = var.name

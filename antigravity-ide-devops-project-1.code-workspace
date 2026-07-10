@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../python-mysql-db-proj-1"
+		},
+		{
+			"path": "../terraform-jenkins"
+		}
+	]
+}
