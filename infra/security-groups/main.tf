@@ -17,10 +17,9 @@ output "sg_ec2_for_python_api" {
 }
 resource "aws_security_group" "ec2_sg_ssh_http" {
   name        = var.ec2_sg_name
-  description = "Enable the Port 22(SSH) & Port 80(http)"
+  description = "Enable SSH(22), HTTP(80), HTTPS(443), and Python API(5000)"
   vpc_id      = var.vpc_id
 
-  # ssh for terraform remote exec
   ingress {
     description = "Allow remote SSH from anywhere"
     cidr_blocks = ["0.0.0.0/0"]
@@ -29,7 +28,6 @@ resource "aws_security_group" "ec2_sg_ssh_http" {
     protocol    = "tcp"
   }
 
-  # enable http
   ingress {
     description = "Allow HTTP request from anywhere"
     cidr_blocks = ["0.0.0.0/0"]
@@ -38,18 +36,24 @@ resource "aws_security_group" "ec2_sg_ssh_http" {
     protocol    = "tcp"
   }
 
-  # enable http
   ingress {
-    description = "Allow HTTP request from anywhere"
+    description = "Allow HTTPS request from anywhere"
     cidr_blocks = ["0.0.0.0/0"]
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
   }
 
-  #Outgoing request
+  ingress {
+    description = "Allow Python API traffic on port 5000 (ALB listener)"
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+  }
+
   egress {
-    description = "Allow outgoing request"
+    description = "Allow all outgoing traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -57,7 +61,7 @@ resource "aws_security_group" "ec2_sg_ssh_http" {
   }
 
   tags = {
-    Name = "Security Groups to allow SSH(22) and HTTP(80)"
+    Name = "Security Groups to allow SSH(22), HTTP(80), HTTPS(443), and API(5000)"
   }
 }
 
@@ -77,19 +81,34 @@ resource "aws_security_group" "rds_mysql_sg" {
 
 resource "aws_security_group" "ec2_sg_python_api" {
   name        = var.ec2_sg_name_for_python_api
-  description = "Enable the Port 5000 for python api"
+  description = "Enable port 5000 for Python API on EC2"
   vpc_id      = var.vpc_id
 
-  # ssh for terraform remote exec
   ingress {
-    description = "Allow traffic on port 5000"
+    description     = "Allow Python API traffic from ALB"
+    from_port       = 5000
+    to_port         = 5000
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ec2_sg_ssh_http.id]
+  }
+
+  ingress {
+    description = "Allow direct Python API traffic on port 5000"
     cidr_blocks = ["0.0.0.0/0"]
     from_port   = 5000
     to_port     = 5000
     protocol    = "tcp"
   }
 
+  egress {
+    description = "Allow all outgoing traffic (RDS, package installs, etc.)"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   tags = {
-    Name = "Security Groups to allow traffic on port 5000"
+    Name = "Security Group for Python API on port 5000"
   }
 }
