@@ -3,6 +3,7 @@ variable "vpc_id" {}
 variable "public_subnet_cidr_block" {}
 variable "ec2_sg_name_for_python_api" {}
 
+
 output "sg_ec2_sg_ssh_http_id" {
   value = aws_security_group.ec2_sg_ssh_http.id
 }
@@ -19,8 +20,12 @@ output "sg_ec2_for_python_api" {
 # Security Group for ALB / SSH / HTTP / HTTPS
 resource "aws_security_group" "ec2_sg_ssh_http" {
   name        = var.ec2_sg_name
-  description = "Enable SSH(22), HTTP(80), and HTTPS(443)"
+  description = "Enable SSH(22), HTTP(80), HTTPS(443), and Python API(5000)"
   vpc_id      = var.vpc_id
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   ingress {
     description = "Allow remote SSH from anywhere"
@@ -55,7 +60,7 @@ resource "aws_security_group" "ec2_sg_ssh_http" {
   }
 
   tags = {
-    Name = "Security Groups to allow SSH(22), HTTP(80), HTTPS(443)"
+    Name = "Security Groups to allow SSH(22), HTTP(80), HTTPS(443), and API(5000)"
   }
 }
 
@@ -83,13 +88,17 @@ resource "aws_security_group" "rds_mysql_sg" {
 }
 
 
-# Security Group for Python API running on EC2
+# Security Group for Python API on EC2
 resource "aws_security_group" "ec2_sg_python_api" {
   name        = var.ec2_sg_name_for_python_api
   description = "Enable port 5000 for Python API on EC2"
   vpc_id      = var.vpc_id
 
-  # Allow ALB traffic to reach Python API
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  # Allow ALB traffic to EC2 on port 5000
   ingress {
     description     = "Allow Python API traffic from ALB"
     from_port       = 5000
@@ -98,7 +107,7 @@ resource "aws_security_group" "ec2_sg_python_api" {
     security_groups = [aws_security_group.ec2_sg_ssh_http.id]
   }
 
-  # Keep direct public access for Free Tier / development usage
+  # Keep public access for Free Tier / development
   ingress {
     description = "Allow direct Python API traffic on port 5000"
     cidr_blocks = ["0.0.0.0/0"]
