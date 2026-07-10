@@ -13,11 +13,13 @@ output "rds_mysql_sg_id" {
 
 output "sg_ec2_for_python_api" {
   value = aws_security_group.ec2_sg_python_api.id
-
 }
+
+
+# Security Group for ALB / SSH / HTTP / HTTPS
 resource "aws_security_group" "ec2_sg_ssh_http" {
   name        = var.ec2_sg_name
-  description = "Enable SSH(22), HTTP(80), HTTPS(443), and Python API(5000)"
+  description = "Enable SSH(22), HTTP(80), and HTTPS(443)"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -44,14 +46,6 @@ resource "aws_security_group" "ec2_sg_ssh_http" {
     protocol    = "tcp"
   }
 
-  ingress {
-    description = "Allow Python API traffic on port 5000 (ALB listener)"
-    cidr_blocks = ["0.0.0.0/0"]
-    from_port   = 5000
-    to_port     = 5000
-    protocol    = "tcp"
-  }
-
   egress {
     description = "Allow all outgoing traffic"
     from_port   = 0
@@ -61,9 +55,10 @@ resource "aws_security_group" "ec2_sg_ssh_http" {
   }
 
   tags = {
-    Name = "Security Groups to allow SSH(22), HTTP(80), HTTPS(443), and API(5000)"
+    Name = "Security Groups to allow SSH(22), HTTP(80), HTTPS(443)"
   }
 }
+
 
 # Security Group for RDS
 resource "aws_security_group" "rds_mysql_sg" {
@@ -75,15 +70,26 @@ resource "aws_security_group" "rds_mysql_sg" {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = var.public_subnet_cidr_block # replace with your EC2 instance security group CIDR block
+    cidr_blocks = var.public_subnet_cidr_block
+  }
+
+  egress {
+    description = "Allow all outgoing traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
+
+# Security Group for Python API running on EC2
 resource "aws_security_group" "ec2_sg_python_api" {
   name        = var.ec2_sg_name_for_python_api
   description = "Enable port 5000 for Python API on EC2"
   vpc_id      = var.vpc_id
 
+  # Allow ALB traffic to reach Python API
   ingress {
     description     = "Allow Python API traffic from ALB"
     from_port       = 5000
@@ -92,6 +98,7 @@ resource "aws_security_group" "ec2_sg_python_api" {
     security_groups = [aws_security_group.ec2_sg_ssh_http.id]
   }
 
+  # Keep direct public access for Free Tier / development usage
   ingress {
     description = "Allow direct Python API traffic on port 5000"
     cidr_blocks = ["0.0.0.0/0"]
