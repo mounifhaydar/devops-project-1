@@ -26,7 +26,7 @@ module "security_group" {
 module "ec2" {
   source                     = "./ec2"
   ami_id                     = var.ec2_ami_id
-  instance_type              = "t2.micro"
+  instance_type              = "t3.micro"
   tag_name                   = "Ubuntu Linux EC2"
   public_key                 = var.public_key
   subnet_id                  = tolist(module.networking.dev_proj_1_public_subnets)[0]
