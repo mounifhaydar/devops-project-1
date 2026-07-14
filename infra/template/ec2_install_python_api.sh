@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euxo pipefail
 
-exec > >(tee /var/log/ec2_install_apache.log | logger -t user-data -s 2>/dev/console) 2>&1
+exec > >(tee /var/log/ec2_install_python_api.log | logger -t user-data -s 2>/dev/console) 2>&1
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -24,17 +24,16 @@ cd /home/ubuntu/python-mysql-db-proj-1
 
 python3 -m venv venv
 
-source venv/bin/activate
+/home/ubuntu/python-mysql-db-proj-1/venv/bin/pip install --upgrade pip
 
-pip install --upgrade pip
-pip install -r requirements.txt
+/home/ubuntu/python-mysql-db-proj-1/venv/bin/pip install -r requirements.txt
 
 chown -R ubuntu:ubuntu /home/ubuntu/python-mysql-db-proj-1
 
-export PORT=5000
-export FLASK_ENV=production
-
-nohup /home/ubuntu/python-mysql-db-proj-1/venv/bin/python app.py \
+nohup env \
+  PORT=5000 \
+  FLASK_ENV=production \
+  /home/ubuntu/python-mysql-db-proj-1/venv/bin/python app.py \
   > /home/ubuntu/python-api.log 2>&1 &
 
 sleep 10
