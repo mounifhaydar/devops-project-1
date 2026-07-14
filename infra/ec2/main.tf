@@ -11,7 +11,7 @@ variable "ssh_private_key_path" {
   default = "~/.ssh/aws_ec2_terraform"
 }
 variable "ssh_user" {
-  default = "ec2-user"
+  default = "ubuntu"
 }
 
 output "ssh_connection_string_for_ec2" {

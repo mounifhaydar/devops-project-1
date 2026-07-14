@@ -38,10 +38,10 @@ module "ec2" {
 
   enable_public_ip_address   = true
 
-  user_data_install_apache   = var.ec2_user_data_install_apache != "" ? var.ec2_user_data_install_apache : templatefile("./template/ec2_install_apache.sh", {})
+  user_data_install_apache   = var.ec2_user_data_install_python_api != "" ? var.ec2_user_data_install_python_api : templatefile("./template/ec2_install_python_api.sh", {})
 
   ssh_private_key_path       = "~/.ssh/aws_ec2_terraform"
-  ssh_user                   = "ec2-user"
+  ssh_user                   = "ubuntu"
 }
 
 
