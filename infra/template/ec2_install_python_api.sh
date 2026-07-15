@@ -33,6 +33,7 @@ chown -R ubuntu:ubuntu /home/ubuntu/python-mysql-db-proj-1
 nohup env \
   PORT=5000 \
   FLASK_ENV=production \
+  DB_HOST="${db_host}" \
   /home/ubuntu/python-mysql-db-proj-1/venv/bin/python app.py \
   > /home/ubuntu/python-api.log 2>&1 &
 

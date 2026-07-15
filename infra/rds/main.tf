@@ -31,3 +31,8 @@ resource "aws_db_instance" "default" {
   publicly_accessible     = false
 }
 
+output "db_instance_address" {
+  description = "DNS hostname of the MySQL instance, without the port."
+  value       = aws_db_instance.default.address
+}
+
